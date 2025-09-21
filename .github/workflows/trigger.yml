@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v3
     - name: Update LAST_UPDATED.txt
       run: |
-        date '+%Y-%m-%d %H:%M:%S %Z' > LAST_UPDATED.txt
+        TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %Z' > LAST_UPDATED.txt
     - name: Commit changes
       run: |
         git config user.name "github-actions[bot]"
