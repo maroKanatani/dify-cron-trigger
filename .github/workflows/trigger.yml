@@ -17,14 +17,12 @@ jobs:
     - name: Update LAST_UPDATED.txt
       run: |
         date '+%Y-%m-%d %H:%M:%S %Z' > LAST_UPDATED.txt
-    - name: Commit updated files
+    - name: Commit changes
       run: |
-        git config core.filemode false
-        if ! git diff --exit-code --quiet
-        then
-          git add -A
-          git config user.name github-actions
-          git config user.email action@github.com
-          git commit -m "Commit updated files"
-          git push
-        fi
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add LAST_UPDATED.txt
+        git commit -m "Update LAST_UPDATED.txt [skip ci]" || echo "No changes to commit"
+    - name: Push changes
+      run: |
+        git push
