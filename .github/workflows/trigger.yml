@@ -1,0 +1,30 @@
+name: Trigger
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Update LAST_UPDATED.txt
+      run: |
+        date '+%Y-%m-%d %H:%M:%S %Z' > LAST_UPDATED.txt
+    - name: Commit updated files
+      run: |
+        git config core.filemode false
+        if ! git diff --exit-code --quiet
+        then
+          git add -A
+          git config user.name github-actions
+          git config user.email action@github.com
+          git commit -m "Commit updated files"
+          git push
+        fi
