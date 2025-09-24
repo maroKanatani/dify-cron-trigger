@@ -14,6 +14,16 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+    - name: Trigger Workflow
+      run: |
+        curl -X POST 'https://api.dify.ai/v1/workflows/run' \
+          --header 'Authorization: Bearer ${{ secrets.DIFY_API_KEY_DAILY_INFO_GATHERING_BOT }}' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "inputs": {},
+            "response_mode": "streaming",
+            "user": "${{ secrets.DIFY_USER_DAILY_INFO_GATHERING_BOT }}"
+          }'
     - name: Update LAST_UPDATED.txt
       run: |
         TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %Z' > LAST_UPDATED.txt
