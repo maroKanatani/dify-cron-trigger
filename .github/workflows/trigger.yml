@@ -21,7 +21,7 @@ jobs:
           --header 'Content-Type: application/json' \
           --data-raw '{
             "inputs": {},
-            "response_mode": "streaming",
+            "response_mode": "blocking",
             "user": "${{ secrets.DIFY_USER_DAILY_INFO_GATHERING_BOT }}"
           }'
     - name: Update LAST_UPDATED.txt
