@@ -15,15 +15,38 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
     - name: Trigger Workflow
-      run: |
-        curl -X POST 'https://api.dify.ai/v1/workflows/run' \
-          --header 'Authorization: Bearer ${{ secrets.DIFY_API_KEY_DAILY_INFO_GATHERING_BOT }}' \
-          --header 'Content-Type: application/json' \
-          --data-raw '{
-            "inputs": {},
-            "response_mode": "blocking",
-            "user": "${{ secrets.DIFY_USER_DAILY_INFO_GATHERING_BOT }}"
-          }'
+      uses: nick-fields/retry@v3
+      env:
+        # Secretsを環境変数として定義
+        API_KEY: ${{ secrets.DIFY_API_KEY_DAILY_INFO_GATHERING_BOT }}
+        USER_NAME: ${{ secrets.DIFY_USER_DAILY_INFO_GATHERING_BOT }}
+      with:
+          max_attempts: 3
+          timeout_minutes: 5
+          delay_seconds: 10
+          command: |
+            echo "Making API request..."
+            
+            curl -sS -X POST 'https://api.dify.ai/v1/workflows/run' \
+              -H "Authorization: Bearer $API_KEY" \
+              -H 'Content-Type: application/json' \
+              -o response.json \
+              --data-raw '{
+                "inputs": {},
+                "response_mode": "blocking",
+                "user": "$USER_NAME"
+              }'
+              
+            status=$(jq -r '.data.status' response.json)
+            echo "API Status: $status"
+
+             if [ "$status" == "failed" ]; then
+              echo "API status is failed. Retrying..."
+              exit 1
+            else
+              echo "API call successful or final status received."
+              exit 0
+            fi
     - name: Update LAST_UPDATED.txt
       run: |
         TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %Z' > LAST_UPDATED.txt
