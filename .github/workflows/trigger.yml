@@ -36,7 +36,7 @@ jobs:
                 "response_mode": "blocking",
                 "user": "$USER_NAME"
               }'
-              
+            cat response.json
             status=$(jq -r '.data.status' response.json)
             echo "API Status: $status"
 
